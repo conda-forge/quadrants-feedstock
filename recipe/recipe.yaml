@@ -204,3 +204,4 @@ extra:
   feedstock-name: quadrants
   recipe-maintainers:
     - jeongseok-meta
+    - traversaro
