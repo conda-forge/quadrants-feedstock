@@ -46,7 +46,7 @@ source:
     file_name: LICENSE-ROCM-DEVICE-LIBS
 
 build:
-  number: 0
+  number: 1
 
 outputs:
   - package:
