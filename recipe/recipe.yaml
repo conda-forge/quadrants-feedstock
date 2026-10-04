@@ -154,6 +154,12 @@ outputs:
       # Build the platform-independent convenience package only once.
       skip:
         - not linux or not x86_64
+        # Also skip wherever the quadrants output is skipped.
+        - match(python, ">=3.14")
+      # Keep one build even though the skip reads python.
+      variant:
+        ignore_keys:
+          - python
     requirements:
       run:
         - ${{ pin_subpackage("quadrants", upper_bound="x.x.x") }}
@@ -172,6 +178,12 @@ outputs:
       # Build the platform-independent convenience package only once.
       skip:
         - not linux or not x86_64
+        # Also skip wherever the quadrants output is skipped.
+        - match(python, ">=3.14")
+      # Keep one build even though the skip reads python.
+      variant:
+        ignore_keys:
+          - python
     requirements:
       run:
         - ${{ pin_subpackage("quadrants", upper_bound="x.x.x") }}
