@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: conda-forge quadrants-feedstock <conda-forge@users.noreply.github.com>
+Date: Tue, 6 Oct 2026 09:00:00 -0700
+Subject: [PATCH] Allow Python 3.14 and newer
+
+Upstream caps requires-python below 3.14 because its CI and wheels stop at
+3.13. Drop the cap so pip can install the extension on newer interpreters.
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 5faa242..ccd692e 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -18,7 +18,7 @@ license = "Apache-2.0"
+ keywords = ["graphics", "simulation"]
+ dynamic = ["version"]
+ readme = "README.md"
+-requires-python = ">=3.10,<3.14"
++requires-python = ">=3.10"
+ dependencies = [
+     "numpy>=1.26.0",
+     "colorama",
