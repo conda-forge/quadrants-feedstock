@@ -16,6 +16,8 @@ source:
       - patches/0001-guard-disabled-amdgpu-includes.patch
       # Use conda-forge dependencies and shared LLVM instead of bundled/static copies.
       - patches/0002-use-system-dependencies.patch
+      # Remove once upstream's requires-python allows Python 3.14 and newer.
+      - patches/0003-allow-newer-python.patch
   # Submodules without packages on every target platform are supplied as
   # separate immutable sources. The remaining submodules are conda packages.
   - url: https://github.com/Maratyszcza/FP16/archive/0a92994d729ff76a58f692d3028ca1b64b145d91.tar.gz
@@ -46,15 +48,12 @@ source:
     file_name: LICENSE-ROCM-DEVICE-LIBS
 
 build:
-  number: 1
+  number: 2
 
 outputs:
   - package:
       name: quadrants
     build:
-      # This is the Python range declared by upstream's pyproject.toml.
-      skip:
-        - match(python, ">=3.14")
       script:
         - if: unix
           then: bash "${RECIPE_DIR}/build.sh"
@@ -154,12 +153,7 @@ outputs:
       # Build the platform-independent convenience package only once.
       skip:
         - not linux or not x86_64
-        # Also skip wherever the quadrants output is skipped.
-        - match(python, ">=3.14")
-      # Keep one build even though the skip reads python.
-      variant:
-        ignore_keys:
-          - python
+        - not is_python_min
     requirements:
       run:
         - ${{ pin_subpackage("quadrants", upper_bound="x.x.x") }}
@@ -178,12 +172,7 @@ outputs:
       # Build the platform-independent convenience package only once.
       skip:
         - not linux or not x86_64
-        # Also skip wherever the quadrants output is skipped.
-        - match(python, ">=3.14")
-      # Keep one build even though the skip reads python.
-      variant:
-        ignore_keys:
-          - python
+        - not is_python_min
     requirements:
       run:
         - ${{ pin_subpackage("quadrants", upper_bound="x.x.x") }}
