@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: quadrants
-  version: "1.3.3"
+  version: "1.4.0"
 
 recipe:
   name: ${{ name|lower }}
@@ -10,7 +10,7 @@ recipe:
 
 source:
   - url: https://github.com/Genesis-Embodied-AI/quadrants/archive/refs/tags/v${{ version }}.tar.gz
-    sha256: d7c8cc6650b1480c080c9fb3b8ab18a5c3af2b58bbc45ac6ed4f4a0e9717e1ea
+    sha256: 0c381f2828c6e2a479cb065b48a2d2d369c823a3e9abc294ddf345af846d018c
     patches:
       # Remove once upstream guards AMDGPU runtime headers when QD_WITH_AMDGPU is disabled.
       - patches/0001-guard-disabled-amdgpu-includes.patch
@@ -48,7 +48,7 @@ source:
     file_name: LICENSE-ROCM-DEVICE-LIBS
 
 build:
-  number: 2
+  number: 0
 
 outputs:
   - package:
