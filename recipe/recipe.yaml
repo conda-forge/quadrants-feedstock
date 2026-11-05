@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: quadrants
-  version: "1.3.3"
+  version: "1.4.0"
 
 recipe:
   name: ${{ name|lower }}
@@ -10,13 +10,13 @@ recipe:
 
 source:
   - url: https://github.com/Genesis-Embodied-AI/quadrants/archive/refs/tags/v${{ version }}.tar.gz
-    sha256: d7c8cc6650b1480c080c9fb3b8ab18a5c3af2b58bbc45ac6ed4f4a0e9717e1ea
+    sha256: 0c381f2828c6e2a479cb065b48a2d2d369c823a3e9abc294ddf345af846d018c
     patches:
       # Remove once upstream guards AMDGPU runtime headers when QD_WITH_AMDGPU is disabled.
       - patches/0001-guard-disabled-amdgpu-includes.patch
       # Use conda-forge dependencies and shared LLVM instead of bundled/static copies.
       - patches/0002-use-system-dependencies.patch
-      # Remove once upstream's requires-python allows Python 3.14 and newer.
+      # Remove once upstream's requires-python allows Python 3.15 and newer.
       - patches/0003-allow-newer-python.patch
   # Submodules without packages on every target platform are supplied as
   # separate immutable sources. The remaining submodules are conda packages.
@@ -48,12 +48,15 @@ source:
     file_name: LICENSE-ROCM-DEVICE-LIBS
 
 build:
-  number: 2
+  number: 0
 
 outputs:
   - package:
       name: quadrants
     build:
+      # Upstream retired Python 3.10 and 3.11 in 1.4.0 (requires-python >=3.12).
+      skip:
+        - match(python, "<3.12")
       script:
         - if: unix
           then: bash "${RECIPE_DIR}/build.sh"
@@ -69,22 +72,30 @@ outputs:
         # Match upstream's cmake_minimum_required declaration.
         - cmake >=3.17
         - ninja
+        # Upstream compiles GLSL shader helpers with glslang 13.1 or newer.
+        - glslang >=13.1
       host:
         - python
         - pip
         # Match upstream's pyproject.toml build-system requirements.
         - setuptools_scm >=6.0
-        - numpy >=2.0.0
+        - if: match(python, ">=3.14")
+          then: numpy >=2.3.4
+          else: numpy >=2.0.0
         # This upper bound is declared by upstream's pyproject.toml.
-        - nanobind >=2.0.0,<2.14.0
+        - nanobind >=2.12.0,<2.14.0
         - scikit-build-core >=0.10
         # Upstream generates nanobind stubs at install time, which imports quadrants.
         - colorama
         - dill
-        - pydantic >=2.0.0
+        - if: match(python, ">=3.14")
+          then: pydantic >=2.12.0
+          else: pydantic >=2.0.0
         - rich >=1.0.0
         - setuptools >=77.0.0
-        - cffi >=1.16.0
+        - if: match(python, ">=3.14")
+          then: cffi >=2.0.0
+          else: cffi >=1.16.0
         # Quadrants embeds LLVM 22 bitcode and links against the matching runtime.
         - llvmdev >=22,<23
         # Static LLVM targets on Windows reference these support libraries.
@@ -106,13 +117,19 @@ outputs:
       run:
         - python
         # Match upstream's project dependencies.
-        - numpy >=1.26.0
+        - if: match(python, ">=3.14")
+          then: numpy >=2.3.4
+          else: numpy >=1.26.0
         - colorama
         - dill
-        - pydantic >=2.0.0
+        - if: match(python, ">=3.14")
+          then: pydantic >=2.12.0
+          else: pydantic >=2.0.0
         - rich >=1.0.0
         - setuptools >=77.0.0
-        - cffi >=1.16.0
+        - if: match(python, ">=3.14")
+          then: cffi >=2.0.0
+          else: cffi >=1.16.0
         - if: unix
           then: libllvm22 >=22,<23
         - if: not osx
@@ -132,7 +149,8 @@ outputs:
         files:
           source:
             - tests/__init__.py
-            - tests/test_utils.py
+            - tests/helpers/__init__.py
+            - tests/helpers/test_utils.py
             - tests/python/__init__.py
             - tests/python/conftest.py
             - tests/python/test_smoke.py
@@ -153,7 +171,12 @@ outputs:
       # Build the platform-independent convenience package only once.
       skip:
         - not linux or not x86_64
-        - not is_python_min
+        # Also skip wherever the quadrants output is skipped.
+        - match(python, "<3.12")
+      # Keep one build even though the skip reads python.
+      variant:
+        ignore_keys:
+          - python
     requirements:
       run:
         - ${{ pin_subpackage("quadrants", upper_bound="x.x.x") }}
@@ -172,7 +195,12 @@ outputs:
       # Build the platform-independent convenience package only once.
       skip:
         - not linux or not x86_64
-        - not is_python_min
+        # Also skip wherever the quadrants output is skipped.
+        - match(python, "<3.12")
+      # Keep one build even though the skip reads python.
+      variant:
+        ignore_keys:
+          - python
     requirements:
       run:
         - ${{ pin_subpackage("quadrants", upper_bound="x.x.x") }}
