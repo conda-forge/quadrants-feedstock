@@ -149,7 +149,8 @@ outputs:
         files:
           source:
             - tests/__init__.py
-            - tests/test_utils.py
+            - tests/helpers/__init__.py
+            - tests/helpers/test_utils.py
             - tests/python/__init__.py
             - tests/python/conftest.py
             - tests/python/test_smoke.py
