@@ -72,6 +72,8 @@ outputs:
         # Match upstream's cmake_minimum_required declaration.
         - cmake >=3.17
         - ninja
+        # Upstream compiles GLSL shader helpers with glslang 13.1 or newer.
+        - glslang >=13.1
       host:
         - python
         - pip
